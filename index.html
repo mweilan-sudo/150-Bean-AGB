@@ -70,7 +70,7 @@
     }
     h1 {
       margin: 0;
-      font-size: clamp(2rem, 4vw, 3.3rem);
+      font-size: clamp(2rem, 4vw, 2.8rem);
       line-height: 1.08;
       letter-spacing: 0;
     }
@@ -315,6 +315,13 @@
       font-size: .94rem;
       margin: 4px 0 0;
     }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .controls button { margin: 0; }
     button {
       background: var(--asu-maroon);
       color: #ffffff;
@@ -328,6 +335,10 @@
     }
     button.secondary { background: #44515f; }
     button:hover { filter: brightness(.96); }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .58;
+    }
     .error {
       border: 2px solid var(--danger);
       background: #fff3f3;
@@ -357,6 +368,47 @@
       color: var(--asu-maroon);
       margin-bottom: 10px;
     }
+    .completion-controls {
+      margin-top: 22px;
+      padding: 16px;
+      border: 2px solid var(--asu-maroon);
+      border-radius: 8px;
+      background: var(--soft-maroon);
+    }
+    .score-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .summary-item {
+      padding: 14px;
+      border-left: 6px solid var(--asu-gold);
+      background: var(--soft-gold);
+    }
+    .summary-item strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--asu-maroon);
+      font-size: 1.2rem;
+    }
+    .submit-button {
+      min-height: 52px;
+      padding: 14px 20px;
+      box-shadow: 0 0 0 4px var(--asu-gold);
+      font-size: 1.05rem;
+    }
+    .submission-status {
+      margin-top: 16px;
+      padding: 12px;
+      border-left: 7px solid var(--asu-blue);
+      border-radius: 6px;
+      background: var(--soft-blue);
+    }
+    .submission-status.success {
+      border-left-color: var(--asu-green);
+      background: var(--soft-green);
+    }
     .tag {
       display: inline-block;
       color: var(--asu-black);
@@ -378,7 +430,16 @@
       white-space: nowrap;
       border: 0;
     }
+    .print-takeaway {
+      display: none;
+    }
     @media (max-width: 760px) {
+      .controls {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .controls button { width: 100%; }
       .flow-map {
         min-width: 0;
         grid-template-columns: 1fr;
@@ -405,14 +466,47 @@
       }
     }
     @media print {
-      .skip-link, form, .controls { display: none; }
+      @page { margin: .65in; }
+      .skip-link, header, main { display: none !important; }
       body { background: #ffffff; }
-      header {
+      .print-takeaway {
+        display: block;
         color: var(--asu-black);
-        background: #ffffff;
+        font-size: 11pt;
       }
-      main { max-width: none; padding: 0; }
-      .panel, .results, .takeaway { break-inside: avoid; }
+      .print-takeaway h1 {
+        padding-bottom: 10px;
+        border-bottom: 4px solid var(--asu-gold);
+        color: var(--asu-maroon);
+        font-size: 24pt;
+      }
+      .print-takeaway h2 {
+        margin-top: 22px;
+        color: var(--asu-maroon);
+        font-size: 15pt;
+      }
+      .print-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 18px 0;
+      }
+      .print-summary div {
+        padding: 10px;
+        border: 1px solid var(--line);
+      }
+      .print-summary strong {
+        display: block;
+        margin-bottom: 3px;
+      }
+      .print-results {
+        columns: 2;
+        column-gap: 28px;
+      }
+      .print-results li {
+        break-inside: avoid;
+        margin-bottom: 7px;
+      }
     }
   </style>
 </head>
@@ -422,7 +516,7 @@
     <div class="header-inner">
       <p class="eyebrow">WPC 150 Case Segment</p>
       <h1>The Story of the Bean: Agribusiness Lens</h1>
-      <p>Begin the case by following a coffee bean before it becomes a menu item, a price, or a brand promise.</p>
+      <p>Examine Copper Cup's sourcing question by following a coffee bean from agricultural production to a customer-facing food product.</p>
     </div>
   </header>
 
@@ -432,16 +526,17 @@
       <p class="reading-width">Read the opening and Agribusiness segment, then move to the practice tab when you are ready to apply the case evidence.</p>
 
       <div class="tab-list" role="tablist" aria-label="Story of the Bean sections">
-        <button class="tab-button" id="tab-opening" type="button" role="tab" aria-selected="true" aria-controls="panel-opening">Case Opening</button>
+        <button class="tab-button" id="tab-opening" type="button" role="tab" aria-selected="true" aria-controls="panel-opening">Case Context</button>
         <button class="tab-button" id="tab-agb" type="button" role="tab" aria-selected="false" aria-controls="panel-agb" tabindex="-1">AGB Narrative</button>
         <button class="tab-button" id="tab-fim" type="button" role="tab" aria-selected="false" aria-controls="panel-fim" tabindex="-1">Food Industry Mgmt</button>
         <button class="tab-button" id="tab-decision" type="button" role="tab" aria-selected="false" aria-controls="panel-decision" tabindex="-1">Sourcing Choices</button>
         <button class="tab-button" id="tab-prompt" type="button" role="tab" aria-selected="false" aria-controls="panel-prompt" tabindex="-1">Decision Point</button>
         <button class="tab-button" id="tab-practice" type="button" role="tab" aria-selected="false" aria-controls="panel-practice" tabindex="-1">Practice</button>
+        <button class="tab-button" id="tab-submit" type="button" role="tab" aria-selected="false" aria-controls="panel-submit" tabindex="-1" hidden>Submit</button>
       </div>
 
-      <article class="tab-panel reading-width" id="panel-opening" role="tabpanel" tabindex="0" aria-labelledby="tab-opening">
-        <h3>Case Premise</h3>
+      <article class="tab-panel" id="panel-opening" role="tabpanel" tabindex="0" aria-labelledby="tab-opening">
+        <h3>Case Context</h3>
         <p>Every cup of coffee begins before the coffee shop. It begins with land, weather, labor, farming knowledge, processing decisions, buyer relationships, financing, price signals, roasting choices, store operations, and customer trust. By the time a student buys a drink before class, the bean has already moved through a business system where people made decisions under uncertainty.</p>
         <p>This case follows <strong>Copper Cup Coffee</strong>, a fictional Arizona coffee company with one busy location near campus. Copper Cup has grown by selling approachable drinks at student-friendly prices. Its founder, <strong>Elena Torres</strong>, wants the company to launch a featured roast called <strong>The Story of the Bean</strong>. The roast would let customers trace a coffee bean from a farmer cooperative to the cafe counter.</p>
         <p>Elena is not trying to make a marketing slogan. She is trying to answer a business question:</p>
@@ -452,11 +547,11 @@
           <h4>AI at Work: Framing the Problem</h4>
           <p>Elena could use AI to summarize customer questions, draft possible launch messages, or compare the three sourcing options in plain language. The risk is that AI may produce language that sounds confident before Copper Cup has evidence. Any AI-assisted summary still needs human review for accuracy, missing stakeholders, and unsupported claims.</p>
         </div>
-        <p>Students will revisit that same question through W. P. Carey disciplines. This first segment begins with Agribusiness because the bean begins as an agricultural product. The other disciplines do not replace that origin story. They add lenses that help Copper Cup understand what happens when the bean becomes a price, an investment, and a managed organization.</p>
+        <p>The Agribusiness lens begins where the bean begins: as an agricultural product moving through a connected food and resource system. This module asks students to examine that system, compare sourcing alternatives, and determine what Copper Cup can responsibly claim.</p>
       </article>
 
-      <article class="tab-panel reading-width" id="panel-decision" role="tabpanel" tabindex="0" aria-labelledby="tab-decision" hidden>
-        <h3>The Decision That Connects the Case</h3>
+      <article class="tab-panel" id="panel-decision" role="tabpanel" tabindex="0" aria-labelledby="tab-decision" hidden>
+        <h3>The Sourcing Decision</h3>
         <p>Copper Cup is considering three sourcing paths for The Story of the Bean.</p>
         <p><strong>Market purchase:</strong> Copper Cup buys green coffee through a broker at the current market price. This keeps purchasing flexible and may support lower menu prices, but the company has limited visibility into farmer income, environmental practices, and working conditions.</p>
         <p><strong>Certified sustainability purchase:</strong> Copper Cup pays a moderate premium for coffee carrying a recognized sustainability certification. This gives customers a visible signal and gives the company a clearer responsibility claim, but certification may not answer every question about value distribution.</p>
@@ -506,8 +601,8 @@
         </table>
       </article>
 
-      <article class="tab-panel reading-width" id="panel-agb" role="tabpanel" tabindex="0" aria-labelledby="tab-agb" hidden>
-        <h3>Part 1: Agribusiness - Before the Bean Has a Brand</h3>
+      <article class="tab-panel" id="panel-agb" role="tabpanel" tabindex="0" aria-labelledby="tab-agb" hidden>
+        <h3>Agribusiness: Before the Bean Has a Brand</h3>
         <p>Maya Alvarez is a first-year W. P. Carey student who works part time at Copper Cup. Elena asks her to help prepare a short launch display for The Story of the Bean. Maya starts with what seems like a simple question:</p>
         <p><strong>"How does this coffee bean get from a farm to our shop?"</strong></p>
         <p>The answer changes the whole project.</p>
@@ -531,7 +626,7 @@
         <p>Agribusiness makes the first disciplinary contribution: it keeps Copper Cup from treating coffee as an input that simply appears on an invoice. The bean is part of a food and resource system. If Copper Cup claims to tell the story of the bean, the company has to ask which parts of the system are visible, which parts remain hidden, and whose work is being valued.</p>
       </article>
 
-      <article class="tab-panel reading-width" id="panel-fim" role="tabpanel" tabindex="0" aria-labelledby="tab-fim" hidden>
+      <article class="tab-panel" id="panel-fim" role="tabpanel" tabindex="0" aria-labelledby="tab-fim" hidden>
         <h3>When the Bean Becomes a Food Product</h3>
         <p>Maya then realizes the next agribusiness question is not only where the bean came from. It is how the bean becomes a food product people can responsibly buy, sell, price, promote, and trust.</p>
         <p>That shift brings in the Food Industry Management side of agribusiness. Copper Cup is not selling an undifferentiated coffee bean. It is trying to turn an agricultural product into a retail food experience. Maya has to think like a food industry manager: Who is the customer? What need does the product meet? What makes it different from every other coffee on the menu? How should the story appear in the cafe, on a mobile preorder screen, on a bag of roasted coffee, or in a customer receipt? What data would tell Copper Cup whether the launch is working?</p>
@@ -608,9 +703,12 @@
           <p>Maya could use AI to summarize customer questions, cluster QR-page comments, compare sales across channels, or draft a launch brief. But AI should not turn strong sales into a stronger responsibility claim. Sales data, customer curiosity, and evidence integrity have to be interpreted together.</p>
         </div>
         <p>The Food Industry Management lens is subtle but important here: agribusiness is not only production agriculture. It includes food marketing, food retailing, new product development, strategic pricing, supply networks, data, technology, risk, and applied industry problem solving.</p>
+        <div class="callout">
+          <p><strong>Explore the majors:</strong> Visit the <a href="https://wpcarey.asu.edu/agribusiness-degrees/undergraduate-programs" target="_blank" rel="noopener">Morrison School undergraduate programs</a> to compare Agribusiness Innovation and Technology, Food Industry Management, and related certificates.</p>
+        </div>
       </article>
 
-      <article class="tab-panel reading-width" id="panel-prompt" role="tabpanel" tabindex="0" aria-labelledby="tab-prompt" hidden>
+      <article class="tab-panel" id="panel-prompt" role="tabpanel" tabindex="0" aria-labelledby="tab-prompt" hidden>
         <h3>Agribusiness Decision Point</h3>
         <p>Copper Cup must choose what kind of sourcing relationship it can responsibly defend.</p>
         <p><strong>Option A: Market purchase</strong></p>
@@ -678,7 +776,8 @@
     <form id="practice-form" novalidate>
       <section class="practice-body" aria-labelledby="practice-heading">
         <h2 id="practice-heading">Interactive Practice</h2>
-        <p>Use the case evidence to build an agribusiness reading of the sourcing decision. Feedback appears after you submit.</p>
+        <p>Use the case evidence to build an agribusiness reading of the sourcing decision. Feedback appears after you select <strong>Check My Agribusiness Reading</strong>.</p>
+        <p><strong>Your Canvas score is based on 10 objective checks:</strong> six system-map matches and four evidence-based decisions. Your sourcing recommendation and claim boundary are optional and are not scored.</p>
 
         <section aria-labelledby="map-practice-heading">
           <h3 id="map-practice-heading">1. Place Actors in the System</h3>
@@ -797,290 +896,470 @@
         </section>
 
         <section aria-labelledby="path-heading">
-          <h3 id="path-heading">6. Recommend a Sourcing Path</h3>
+          <h3 id="path-heading">Optional: Recommend a Sourcing Path</h3>
+          <p class="hint"><strong><em>Not scored.</em></strong> Your recommendation and claim boundary stay in your browser and are included when you print or save your take-away as a PDF.</p>
           <fieldset>
             <legend>Which path best fits a launch that wants a truthful farm-to-cup story?</legend>
-            <label class="choice-row"><input type="radio" name="path" value="market" required> Market purchase: lowest cost and most flexibility.</label>
+            <label class="choice-row"><input type="radio" name="path" value="market"> Market purchase: lowest cost and most flexibility.</label>
             <label class="choice-row"><input type="radio" name="path" value="certified"> Certified sustainability purchase: clearer signal with moderate added cost.</label>
             <label class="choice-row"><input type="radio" name="path" value="direct"> Direct cooperative partnership: strongest learning relationship with higher complexity.</label>
           </fieldset>
         </section>
 
         <section aria-labelledby="reflection-heading">
-          <h3 id="reflection-heading">7. Write the Claim Boundary</h3>
+          <h3 id="reflection-heading">Optional: Write the Claim Boundary</h3>
           <label for="claim-boundary">Name one claim Copper Cup should avoid unless it has evidence.</label>
-          <textarea id="claim-boundary" name="claimBoundary" required></textarea>
+          <textarea id="claim-boundary" name="claimBoundary"></textarea>
         </section>
       </section>
 
       <div id="form-error" class="error" role="alert" tabindex="-1" hidden></div>
       <div class="controls">
-        <button type="submit">Check My Agribusiness Reading</button>
+        <button type="submit" id="check-practice">Check My Agribusiness Reading</button>
         <button type="button" class="secondary" id="reset-btn">Reset</button>
       </div>
     </form>
 
     <section id="results" class="results" aria-live="polite" hidden>
-      <h2>Feedback</h2>
+      <h3>Agribusiness Feedback</h3>
       <p class="score" id="score-line"></p>
       <div id="feedback-list"></div>
     </section>
 
-    <section id="takeaway" class="takeaway" hidden>
-      <h2>Agribusiness Takeaway</h2>
-      <p>A strong agribusiness reading does not treat coffee as an input that simply appears on an invoice. It sees the bean as part of a food and resource system where farming, processing, logistics, markets, communities, sustainability, and truthful communication are connected.</p>
-      <p>The Food Industry Management lens adds the retail question: how does Copper Cup turn a responsible sourcing idea into a differentiated product, channel plan, price, data dashboard, and customer message?</p>
-      <p>AI can help organize the system, draft comparisons, and surface stakeholder questions, but Copper Cup still has to verify evidence before making claims about people, places, and sustainability.</p>
-      <div id="takeaway-tags" aria-label="Selected sourcing path"></div>
-      <div class="controls">
-        <button type="button" onclick="window.print()">Print Takeaway</button>
-      </div>
-    </section>
+        <div class="completion-controls" id="completion-controls">
+          <h3>Review and Submit</h3>
+          <p id="completion-message">Complete the 10 objective practice checks to activate the Canvas review and submission step.</p>
+          <button type="button" id="review-submit" disabled>Review and Submit to Canvas</button>
+        </div>
+      </article>
+
+      <article class="tab-panel" id="panel-submit" role="tabpanel" tabindex="0" aria-labelledby="tab-submit" hidden>
+        <h2>Required Final Step: Submit Your Score to Canvas</h2>
+        <p>Your practice checks are complete. Review the summary and then select the submission button. Your score is not sent automatically.</p>
+
+        <div class="score-summary" aria-label="Completion summary">
+          <div class="summary-item">
+            <strong id="final-score">0/100</strong>
+            Current objective score
+          </div>
+          <div class="summary-item">
+            <strong>10/10</strong>
+            Objective checks complete
+          </div>
+          <div class="summary-item">
+            <strong>Unscored</strong>
+            Recommendation and reflection
+          </div>
+        </div>
+
+        <section id="takeaway">
+          <h2>Agribusiness Takeaway</h2>
+          <p>A strong agribusiness reading does not treat coffee as an input that simply appears on an invoice. It sees the bean as part of a food and resource system where farming, processing, logistics, markets, communities, sustainability, and truthful communication are connected.</p>
+          <p>The Food Industry Management lens adds the retail question: how does Copper Cup turn a responsible sourcing idea into a differentiated product, channel plan, price, data dashboard, and customer message?</p>
+          <p>AI can help organize the system, draft comparisons, and surface stakeholder questions, but Copper Cup still has to verify evidence before making claims about people, places, and sustainability.</p>
+          <p><strong>Your sourcing recommendation:</strong> <span id="selected-path">No path selected.</span></p>
+          <p><strong>Your claim boundary:</strong> <span id="claim-boundary-summary">No claim boundary entered.</span></p>
+        </section>
+
+        <button class="submit-button" id="submit-score" type="button">Submit Score to Canvas</button>
+        <button type="button" class="secondary" id="print-takeaway-button">Print to PDF</button>
+        <div class="submission-status" id="submission-status" role="status" aria-live="polite">Score not yet submitted.</div>
       </article>
     </section>
   </main>
 
+  <section class="print-takeaway" id="print-takeaway" aria-label="Printable agribusiness take-away">
+    <p><strong>WPC 150</strong></p>
+    <h1>The Story of the Bean: Agribusiness Take-Away</h1>
+
+    <div class="print-summary">
+      <div><strong id="print-score">0 out of 100</strong>Objective score</div>
+      <div><strong id="print-checked">0 of 10</strong>Objective checks</div>
+      <div><strong id="print-submission">Not confirmed</strong>Canvas submission</div>
+    </div>
+
+    <h2>Key Takeaway</h2>
+    <p>A strong agribusiness reading follows the bean through a connected food and resource system. Farming, processing, logistics, markets, communities, sustainability, retail decisions, and truthful communication all shape the final product.</p>
+    <p>AI can organize evidence and surface questions, but Copper Cup must verify claims about people, places, and sustainability.</p>
+
+    <h2>Your Optional Notes</h2>
+    <p><strong>Sourcing recommendation:</strong> <span id="print-path">No path selected.</span></p>
+    <p><strong>Claim boundary:</strong> <span id="print-claim-boundary">No claim boundary entered.</span></p>
+
+    <h2>Objective Results</h2>
+    <ol class="print-results" id="print-results"></ol>
+  </section>
+
   <script>
-    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
-    const tabPanels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
-    function activateTab(tab, moveFocus = true) {
-      tabs.forEach(item => {
-        const selected = item === tab;
-        item.setAttribute("aria-selected", selected ? "true" : "false");
-        item.tabIndex = selected ? 0 : -1;
+    (function () {
+      "use strict";
+
+      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+      const tabPanels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+      const visibleTabs = () => tabs.filter(tab => !tab.hidden);
+
+      function activateTab(tab, moveFocus = true) {
+        tabs.forEach(item => {
+          const selected = item === tab;
+          item.setAttribute("aria-selected", selected ? "true" : "false");
+          item.tabIndex = selected ? 0 : -1;
+        });
+        tabPanels.forEach(panel => {
+          panel.hidden = panel.id !== tab.getAttribute("aria-controls");
+        });
+        if (moveFocus) tab.focus();
+      }
+
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => activateTab(tab, false));
+        tab.addEventListener("keydown", event => {
+          const availableTabs = visibleTabs();
+          const index = availableTabs.indexOf(tab);
+          let nextIndex = null;
+          if (event.key === "ArrowRight") nextIndex = (index + 1) % availableTabs.length;
+          if (event.key === "ArrowLeft") nextIndex = (index - 1 + availableTabs.length) % availableTabs.length;
+          if (event.key === "Home") nextIndex = 0;
+          if (event.key === "End") nextIndex = availableTabs.length - 1;
+          if (nextIndex !== null) {
+            event.preventDefault();
+            activateTab(availableTabs[nextIndex]);
+          }
+        });
       });
-      tabPanels.forEach(panel => {
-        panel.hidden = panel.id !== tab.getAttribute("aria-controls");
+
+      let scormAPI = null;
+      let scormInitialized = false;
+      let scoreSubmitted = false;
+
+      function findAPI(startWindow) {
+        let current = startWindow;
+        let attempts = 0;
+        while (current && attempts < 8) {
+          try {
+            if (current.API) return current.API;
+            if (current.parent === current) break;
+            current = current.parent;
+          } catch (error) {
+            break;
+          }
+          attempts += 1;
+        }
+        return null;
+      }
+
+      function scormInit() {
+        scormAPI = findAPI(window) || (window.opener ? findAPI(window.opener) : null);
+        if (!scormAPI) return false;
+        const initialized = scormAPI.LMSInitialize("");
+        scormInitialized = initialized === true || initialized === "true";
+        if (!scormInitialized) return false;
+        const status = scormAPI.LMSGetValue("cmi.core.lesson_status");
+        if (!status || status === "not attempted") {
+          scormAPI.LMSSetValue("cmi.core.lesson_status", "incomplete");
+          scormAPI.LMSCommit("");
+        }
+        return true;
+      }
+
+      function submitToCanvas(score) {
+        if (!scormInitialized || !scormAPI) {
+          return { sent: false, message: `Local preview: your score is ${score} out of 100, but no Canvas SCORM connection was found.` };
+        }
+        scormAPI.LMSSetValue("cmi.core.score.min", "0");
+        scormAPI.LMSSetValue("cmi.core.score.max", "100");
+        scormAPI.LMSSetValue("cmi.core.score.raw", String(score));
+        scormAPI.LMSSetValue("cmi.core.lesson_status", "completed");
+        const committed = scormAPI.LMSCommit("");
+        const sent = committed === true || committed === "true";
+        return sent
+          ? { sent: true, message: `Score submitted to Canvas: ${score} out of 100.` }
+          : { sent: false, message: `Canvas did not confirm the submission. Your current score is ${score} out of 100; please try again.` };
+      }
+
+      window.addEventListener("load", scormInit);
+      window.addEventListener("beforeunload", () => {
+        if (scormInitialized && scormAPI) scormAPI.LMSFinish("");
       });
-      if (moveFocus) tab.focus();
-    }
-    tabs.forEach((tab, index) => {
-      tab.addEventListener("click", () => activateTab(tab, false));
-      tab.addEventListener("keydown", event => {
-        let nextIndex = null;
-        if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
-        if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
-        if (event.key === "Home") nextIndex = 0;
-        if (event.key === "End") nextIndex = tabs.length - 1;
-        if (nextIndex !== null) {
-          event.preventDefault();
-          activateTab(tabs[nextIndex]);
+
+      const form = document.getElementById("practice-form");
+      const errorBox = document.getElementById("form-error");
+      const results = document.getElementById("results");
+      const feedbackList = document.getElementById("feedback-list");
+      const scoreLine = document.getElementById("score-line");
+      const completionMessage = document.getElementById("completion-message");
+      const reviewSubmitButton = document.getElementById("review-submit");
+      const finalScore = document.getElementById("final-score");
+      const submitTab = document.getElementById("tab-submit");
+      const submissionStatus = document.getElementById("submission-status");
+      const submitButton = document.getElementById("submit-score");
+      const checkButton = document.getElementById("check-practice");
+      const resetButton = document.getElementById("reset-btn");
+      let currentScore = 0;
+      let practiceChecked = false;
+
+      const correctMatches = {
+        actorCoop: "origin",
+        actorMill: "processing",
+        actorImporter: "movement",
+        actorRoaster: "roasting",
+        actorCafe: "retail",
+        actorCertifier: "verification"
+      };
+
+      function selectedRadio(name) {
+        return form.querySelector(`input[name="${name}"]:checked`);
+      }
+
+      function selectedCheckboxes(name) {
+        return Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(input => input.value);
+      }
+
+      function missingFields() {
+        const missing = [];
+        Object.keys(correctMatches).forEach(name => {
+          if (!form.elements[name].value) missing.push("actor map");
+        });
+        if (!selectedRadio("claim")) missing.push("sustainability claim");
+        if (!selectedRadio("aiAudit")) missing.push("AI recommendation audit");
+        if (!selectedRadio("retailMetric")) missing.push("food retailing metric");
+        if (!selectedCheckboxes("stakeholders").length) missing.push("stakeholders");
+        return Array.from(new Set(missing));
+      }
+
+      function addFeedback(title, status, message) {
+        const div = document.createElement("div");
+        div.className = `feedback ${status === "strong" ? "strong" : status === "needs-work" ? "needs-work" : ""}`;
+        const labels = {
+          strong: "Strong reading.",
+          "needs-work": "Revisit this.",
+          caution: "Reasonable with a caution.",
+          note: "Unscored response."
+        };
+        div.innerHTML = `<h3>${title}</h3><p><strong>${labels[status]}</strong> ${message}</p>`;
+        feedbackList.appendChild(div);
+      }
+
+      function scoreMatches() {
+        return Object.entries(correctMatches).filter(([name, value]) => form.elements[name].value === value).length;
+      }
+
+      function stakeholdersAreCorrect() {
+        const selected = selectedCheckboxes("stakeholders").sort();
+        const desired = ["communities", "customers", "employees", "farmers"];
+        return selected.length === desired.length && desired.every((value, index) => selected[index] === value);
+      }
+
+      function pathFeedback(path) {
+        if (path === "direct") {
+          return {
+            label: "Direct cooperative partnership",
+            message: "This path creates the strongest direct learning relationship. It also brings higher cost, supply risk, and greater responsibility for what Copper Cup claims."
+          };
+        }
+        if (path === "certified") {
+          return {
+            label: "Certified sustainability purchase",
+            message: "This path supports a visible responsibility signal, but Copper Cup should explain what the certification covers and what it does not prove."
+          };
+        }
+        if (path === "market") {
+          return {
+            label: "Market purchase",
+            message: "This path protects flexibility and price, but it provides the least evidence for a transparent farm-to-cup claim."
+          };
+        }
+        return { label: "No path selected.", message: "No optional sourcing recommendation was entered." };
+      }
+
+      function updateSubmitSummary() {
+        const path = selectedRadio("path");
+        const reflection = form.elements.claimBoundary.value.trim();
+        document.getElementById("selected-path").textContent = pathFeedback(path ? path.value : "").label;
+        document.getElementById("claim-boundary-summary").textContent = reflection || "No claim boundary entered.";
+      }
+
+      function invalidatePractice() {
+        if (!practiceChecked || scoreSubmitted) return;
+        practiceChecked = false;
+        currentScore = 0;
+        results.hidden = true;
+        reviewSubmitButton.disabled = true;
+        completionMessage.textContent = "Complete the 10 objective practice checks to activate the Canvas review and submission step.";
+        submitTab.hidden = true;
+        feedbackList.innerHTML = "";
+        scoreLine.textContent = "";
+        submissionStatus.textContent = "Score not yet submitted.";
+        submissionStatus.className = "submission-status";
+        if (submitTab.getAttribute("aria-selected") === "true") {
+          activateTab(document.getElementById("tab-practice"), false);
+        }
+      }
+
+      const objectiveControls = Array.from(form.querySelectorAll(
+        'select[required], input[name="claim"], input[name="aiAudit"], input[name="retailMetric"], input[name="stakeholders"]'
+      ));
+      objectiveControls.forEach(control => control.addEventListener("change", invalidatePractice));
+
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        const missing = missingFields();
+        if (missing.length) {
+          errorBox.hidden = false;
+          errorBox.textContent = `Please complete: ${missing.join(", ")}.`;
+          errorBox.focus();
+          return;
+        }
+
+        errorBox.hidden = true;
+        feedbackList.innerHTML = "";
+
+        const matchCorrect = scoreMatches();
+        const claimCorrect = selectedRadio("claim").value === "supported";
+        const aiAuditCorrect = selectedRadio("aiAudit").value === "unsupported";
+        const retailMetricCorrect = selectedRadio("retailMetric").value === "balanced";
+        const stakeholderCorrect = stakeholdersAreCorrect();
+        currentScore = (matchCorrect * 10)
+          + (claimCorrect ? 10 : 0)
+          + (aiAuditCorrect ? 10 : 0)
+          + (retailMetricCorrect ? 10 : 0)
+          + (stakeholderCorrect ? 10 : 0);
+
+        scoreLine.textContent = `Practice score: ${currentScore} out of 100. This score has not been submitted to Canvas.`;
+        finalScore.textContent = `${currentScore}/100`;
+
+        addFeedback(
+          "Farm-to-Cup Map",
+          matchCorrect >= 5 ? "strong" : matchCorrect >= 3 ? "caution" : "needs-work",
+          `You matched ${matchCorrect} of 6 actors. Production, processing, movement, roasting, retail, and verification are distinct parts of one agribusiness system.`
+        );
+        addFeedback(
+          "Sustainability Claim",
+          claimCorrect ? "strong" : "needs-work",
+          claimCorrect
+            ? "The strongest claim says what Copper Cup pays for, what relationship it is building, and what it is still learning."
+            : "The case does not support broad guarantees. A label, QR code, or single purchase does not prove that every system outcome is fair or sustainable."
+        );
+        addFeedback(
+          "AI Recommendation Audit",
+          aiAuditCorrect ? "strong" : "needs-work",
+          aiAuditCorrect
+            ? "The AI draft must be audited against evidence because it overclaims ethics, sustainability, and farmer outcomes."
+            : "The central issue is unsupported evidence, not tone or missing price math. The AI output makes claims Copper Cup has not verified."
+        );
+        addFeedback(
+          "Food Retailing Dashboard",
+          retailMetricCorrect ? "strong" : "needs-work",
+          retailMetricCorrect
+            ? "A responsible dashboard connects demand, customer understanding, inventory, employee workload, and evidence status."
+            : "A single metric can mislead. Copper Cup needs to connect retail performance with customer understanding, inventory risk, workload, and claim evidence."
+        );
+        addFeedback(
+          "Stakeholder View",
+          stakeholderCorrect ? "strong" : "needs-work",
+          stakeholderCorrect
+            ? "A complete stakeholder view includes people close to the farm and people close to the cafe."
+            : "The decision affects farmers and farm families, employees, customers, and communities. Selecting only some groups, or treating sourcing as ownership-only, hides part of the system."
+        );
+
+        const path = selectedRadio("path");
+        if (path) addFeedback("Sourcing Recommendation", "note", pathFeedback(path.value).message);
+        const reflection = form.elements.claimBoundary.value.trim();
+        if (reflection) {
+          addFeedback(
+            "Claim Boundary",
+            "note",
+            "Use this boundary to identify evidence Copper Cup would need before making the claim publicly."
+          );
+        }
+
+        practiceChecked = true;
+        results.hidden = false;
+        reviewSubmitButton.disabled = false;
+        completionMessage.innerHTML = `All 10 objective checks are complete. Your current score is <strong><span id="practice-score">${currentScore}</span> out of 100</strong>. Review your results before completing the required Canvas submission step.`;
+        submitTab.hidden = false;
+        updateSubmitSummary();
+        results.scrollIntoView({ block: "start" });
+      });
+
+      reviewSubmitButton.addEventListener("click", () => {
+        if (!practiceChecked) return;
+        updateSubmitSummary();
+        activateTab(submitTab, true);
+        document.getElementById("panel-submit").scrollIntoView({ block: "start" });
+      });
+
+      submitButton.addEventListener("click", () => {
+        if (!practiceChecked) return;
+        const result = submitToCanvas(currentScore);
+        submissionStatus.textContent = result.message;
+        submissionStatus.className = `submission-status${result.sent ? " success" : ""}`;
+        scoreSubmitted = result.sent;
+        if (result.sent) {
+          submitButton.disabled = true;
+          submitButton.textContent = "Score Submitted to Canvas";
+          objectiveControls.forEach(control => { control.disabled = true; });
+          checkButton.disabled = true;
+          resetButton.disabled = true;
         }
       });
-    });
 
-    let scormAPI = null;
-    function findAPI(win) {
-      let attempts = 0;
-      while (win && attempts < 7) {
-        if (win.API) return win.API;
-        win = win.parent;
-        attempts += 1;
-      }
-      return null;
-    }
-    function scormInit() {
-      scormAPI = findAPI(window) || (window.opener ? findAPI(window.opener) : null);
-      if (scormAPI) {
-        scormAPI.LMSInitialize("");
-        scormAPI.LMSSetValue("cmi.core.lesson_status", "incomplete");
-        scormAPI.LMSCommit("");
-      }
-    }
-    function scormComplete(score) {
-      if (!scormAPI) return;
-      scormAPI.LMSSetValue("cmi.core.score.raw", String(score));
-      scormAPI.LMSSetValue("cmi.core.score.min", "0");
-      scormAPI.LMSSetValue("cmi.core.score.max", "100");
-      scormAPI.LMSSetValue("cmi.core.lesson_status", "completed");
-      scormAPI.LMSCommit("");
-    }
-    window.addEventListener("load", scormInit);
-    window.addEventListener("beforeunload", () => { if (scormAPI) scormAPI.LMSFinish(""); });
-
-    const form = document.getElementById("practice-form");
-    const errorBox = document.getElementById("form-error");
-    const results = document.getElementById("results");
-    const takeaway = document.getElementById("takeaway");
-    const feedbackList = document.getElementById("feedback-list");
-    const scoreLine = document.getElementById("score-line");
-    const takeawayTags = document.getElementById("takeaway-tags");
-
-    const correctMatches = {
-      actorCoop: "origin",
-      actorMill: "processing",
-      actorImporter: "movement",
-      actorRoaster: "roasting",
-      actorCafe: "retail",
-      actorCertifier: "verification"
-    };
-
-    function selectedRadio(name) {
-      return form.querySelector(`input[name="${name}"]:checked`);
-    }
-
-    function selectedCheckboxes(name) {
-      return Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(input => input.value);
-    }
-
-    function missingFields() {
-      const missing = [];
-      Object.keys(correctMatches).forEach(name => {
-        if (!form.elements[name].value) missing.push("actor map");
+      resetButton.addEventListener("click", () => {
+        form.reset();
+        practiceChecked = false;
+        currentScore = 0;
+        errorBox.hidden = true;
+        results.hidden = true;
+        reviewSubmitButton.disabled = true;
+        completionMessage.textContent = "Complete the 10 objective practice checks to activate the Canvas review and submission step.";
+        submitTab.hidden = true;
+        feedbackList.innerHTML = "";
+        scoreLine.textContent = "";
+        finalScore.textContent = "0/100";
+        submissionStatus.textContent = "Score not yet submitted.";
+        submissionStatus.className = "submission-status";
       });
-      if (!selectedRadio("claim")) missing.push("sustainability claim");
-      if (!selectedRadio("aiAudit")) missing.push("AI recommendation audit");
-      if (!selectedRadio("retailMetric")) missing.push("food retailing metric");
-      if (!selectedCheckboxes("stakeholders").length) missing.push("stakeholders");
-      if (!selectedRadio("path")) missing.push("sourcing path");
-      if (!form.elements.claimBoundary.value.trim()) missing.push("claim boundary");
-      return Array.from(new Set(missing));
-    }
 
-    function addFeedback(title, status, message) {
-      const div = document.createElement("div");
-      div.className = `feedback ${status === "strong" ? "strong" : status === "needs-work" ? "needs-work" : ""}`;
-      const label = status === "strong" ? "Strong reading." : status === "needs-work" ? "Revisit this." : "Reasonable with a caution.";
-      div.innerHTML = `<h3>${title}</h3><p><strong>${label}</strong> ${message}</p>`;
-      feedbackList.appendChild(div);
-    }
+      function preparePrintTakeaway() {
+        const path = selectedRadio("path");
+        const claim = selectedRadio("claim");
+        const aiAudit = selectedRadio("aiAudit");
+        const retailMetric = selectedRadio("retailMetric");
+        const reflection = form.elements.claimBoundary.value.trim();
+        document.getElementById("print-score").textContent = `${currentScore} out of 100`;
+        document.getElementById("print-checked").textContent = practiceChecked ? "10 of 10" : "0 of 10";
+        document.getElementById("print-submission").textContent = scoreSubmitted ? "Confirmed" : "Not confirmed";
+        document.getElementById("print-path").textContent = pathFeedback(path ? path.value : "").label;
+        document.getElementById("print-claim-boundary").textContent = reflection || "No claim boundary entered.";
 
-    function scoreMatches() {
-      let correct = 0;
-      Object.entries(correctMatches).forEach(([name, value]) => {
-        if (form.elements[name].value === value) correct += 1;
+        const checks = [
+          ["Farmer cooperative system role", form.elements.actorCoop.value === correctMatches.actorCoop],
+          ["Processor or mill system role", form.elements.actorMill.value === correctMatches.actorMill],
+          ["Exporter and importer system role", form.elements.actorImporter.value === correctMatches.actorImporter],
+          ["Roaster system role", form.elements.actorRoaster.value === correctMatches.actorRoaster],
+          ["Copper Cup employees system role", form.elements.actorCafe.value === correctMatches.actorCafe],
+          ["Certifying or verification organization system role", form.elements.actorCertifier.value === correctMatches.actorCertifier],
+          ["Sustainability claim", Boolean(claim && claim.value === "supported")],
+          ["AI recommendation audit", Boolean(aiAudit && aiAudit.value === "unsupported")],
+          ["Food retailing metric", Boolean(retailMetric && retailMetric.value === "balanced")],
+          ["Stakeholder view", stakeholdersAreCorrect()]
+        ];
+
+        const printResults = document.getElementById("print-results");
+        printResults.replaceChildren();
+        checks.forEach(([label, correct]) => {
+          const item = document.createElement("li");
+          item.textContent = `${label}: ${practiceChecked ? (correct ? "Correct" : "Review recommended") : "Not checked"}`;
+          printResults.appendChild(item);
+        });
+      }
+
+      document.getElementById("print-takeaway-button").addEventListener("click", () => {
+        preparePrintTakeaway();
+        window.print();
       });
-      return correct;
-    }
 
-    function scoreStakeholders() {
-      const selected = selectedCheckboxes("stakeholders");
-      const desired = ["farmers", "employees", "customers", "communities"];
-      let points = desired.filter(item => selected.includes(item)).length;
-      if (selected.includes("owner-only")) points -= 2;
-      return Math.max(0, points);
-    }
-
-    function pathFeedback(path) {
-      if (path === "direct") {
-        return {
-          points: 18,
-          status: "strong",
-          tag: "Direct cooperative partnership",
-          message: "This path gives Copper Cup the strongest basis for a farm-to-cup story because it creates a direct learning relationship. The tradeoff is real: higher cost, supply risk, and more responsibility."
-        };
-      }
-      if (path === "certified") {
-        return {
-          points: 14,
-          status: "caution",
-          tag: "Certified sustainability purchase",
-          message: "This path can support a visible responsibility signal, but Copper Cup should explain what the certification covers and what it does not prove."
-        };
-      }
-      return {
-        points: 8,
-        status: "needs-work",
-        tag: "Market purchase",
-        message: "This path protects flexibility and price, but it gives Copper Cup the weakest evidence for a transparent farm-to-cup claim."
-      };
-    }
-
-    form.addEventListener("submit", event => {
-      event.preventDefault();
-      const missing = missingFields();
-      if (missing.length) {
-        errorBox.hidden = false;
-        errorBox.textContent = `Please complete: ${missing.join(", ")}.`;
-        errorBox.focus();
-        return;
-      }
-      errorBox.hidden = true;
-      feedbackList.innerHTML = "";
-      takeawayTags.innerHTML = "";
-
-      const matchCorrect = scoreMatches();
-      const matchPoints = Math.round((matchCorrect / 6) * 20);
-      const claimChoice = selectedRadio("claim").value;
-      const claimCorrect = claimChoice === "supported";
-      const aiAuditCorrect = selectedRadio("aiAudit").value === "unsupported";
-      const retailMetricCorrect = selectedRadio("retailMetric").value === "balanced";
-      const stakeholderPoints = Math.min(13, scoreStakeholders() * 4);
-      const path = selectedRadio("path").value;
-      const pathResult = pathFeedback(path);
-      const reflection = form.elements.claimBoundary.value.trim();
-      const reflectionPoints = reflection.length >= 25 ? 12 : 6;
-      const score = Math.min(100, matchPoints + (claimCorrect ? 12 : 0) + (aiAuditCorrect ? 12 : 0) + (retailMetricCorrect ? 13 : 0) + stakeholderPoints + pathResult.points + reflectionPoints);
-
-      scoreLine.textContent = `Practice score saved: ${score} out of 100`;
-
-      addFeedback(
-        "Farm-to-Cup Map",
-        matchCorrect >= 5 ? "strong" : matchCorrect >= 3 ? "caution" : "needs-work",
-        `You matched ${matchCorrect} of 6 actors. The key move is to see production, processing, movement, roasting, retail, and verification as different parts of one agribusiness system.`
-      );
-
-      addFeedback(
-        "Sustainability Claim",
-        claimCorrect ? "strong" : "needs-work",
-        claimCorrect
-          ? "The strongest claim is precise: Copper Cup can say what it pays for, what relationship it is building, and what it is still learning."
-          : "The case does not support broad guarantees. A responsible claim avoids implying that a label, QR code, or single purchase solves the whole system."
-      );
-
-      addFeedback(
-        "AI Recommendation Audit",
-        aiAuditCorrect ? "strong" : "needs-work",
-        aiAuditCorrect
-          ? "AI can help generate a first draft, but the draft must be audited against evidence. This output overclaims ethics, sustainability, and farmer outcomes."
-          : "The biggest issue is not tone or missing price math. The biggest issue is that the AI output makes claims Copper Cup has not verified."
-      );
-
-      addFeedback(
-        "Food Retailing Dashboard",
-        retailMetricCorrect ? "strong" : "needs-work",
-        retailMetricCorrect
-          ? "A responsible food retailing dashboard connects demand, customer understanding, inventory, employee workload, and evidence status. Sales alone cannot prove the story is working responsibly."
-          : "A single metric can be misleading. Copper Cup needs to connect retail performance with customer understanding, inventory risk, workload, and claim evidence."
-      );
-
-      const selectedStakeholders = selectedCheckboxes("stakeholders");
-      addFeedback(
-        "Stakeholder View",
-        stakeholderPoints >= 12 ? "strong" : stakeholderPoints >= 8 ? "caution" : "needs-work",
-        selectedStakeholders.includes("owner-only")
-          ? "Ownership matters, but the sourcing decision reaches farmers, employees, customers, and communities. Treating it as only an internal purchasing issue hides the system."
-          : "A strong stakeholder view includes people close to the farm and people close to the cafe, because both sides shape the value and risk of the launch."
-      );
-
-      addFeedback("Sourcing Recommendation", pathResult.status, pathResult.message);
-
-      addFeedback(
-        "Claim Boundary",
-        reflection.length >= 25 ? "strong" : "caution",
-        "A useful boundary names what Copper Cup should not say unless it has evidence, such as guaranteed farmer wellbeing, complete sustainability, or risk-free traceability."
-      );
-
-      const tag = document.createElement("span");
-      tag.className = "tag";
-      tag.textContent = pathResult.tag;
-      takeawayTags.appendChild(tag);
-
-      results.hidden = false;
-      takeaway.hidden = false;
-      scormComplete(score);
-      results.scrollIntoView({ block: "start" });
-    });
-
-    document.getElementById("reset-btn").addEventListener("click", () => {
-      form.reset();
-      errorBox.hidden = true;
-      results.hidden = true;
-      takeaway.hidden = true;
-      feedbackList.innerHTML = "";
-      scoreLine.textContent = "";
-      takeawayTags.innerHTML = "";
-    });
+      window.addEventListener("beforeprint", preparePrintTakeaway);
+    }());
   </script>
 </body>
 </html>
